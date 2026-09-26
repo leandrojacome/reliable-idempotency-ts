@@ -1,12 +1,13 @@
 import type { IdempotencyRecord } from "../domain/idempotency-record.js";
+import type { IdempotencyKey, RequestFingerprint } from "../domain/value-objects.js";
 
 export interface IdempotencyRepository<T> {
-  find(key: string): Promise<IdempotencyRecord<T> | undefined>;
-  reserve(key: string, fingerprint: string): Promise<boolean>;
-  complete(key: string, fingerprint: string, value: T): Promise<void>;
-  release(key: string, fingerprint: string): Promise<void>;
+  find(key: IdempotencyKey): Promise<IdempotencyRecord<T> | undefined>;
+  reserve(key: IdempotencyKey, fingerprint: RequestFingerprint): Promise<boolean>;
+  complete(key: IdempotencyKey, fingerprint: RequestFingerprint, value: T): Promise<void>;
+  release(key: IdempotencyKey, fingerprint: RequestFingerprint): Promise<void>;
 }
 
 export interface FingerprintStrategy<I> {
-  fingerprint(input: I): string;
+  fingerprint(input: I): RequestFingerprint;
 }

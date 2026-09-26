@@ -1,21 +1,21 @@
-# Arquitetura
+# Architecture
 
-## Contexto e linguagem
+## Domain model
 
-Bounded context **Execução Idempotente**. A linguagem ubíqua é: chave de idempotência, fingerprint, reserva, operação em processamento e resultado concluído. `IdempotencyRecord` é a entidade; `IdempotencyKey` e `RequestFingerprint` são value objects opacos com invariantes próprias.
+The **Idempotent Execution** bounded context uses the following ubiquitous language: idempotency key, fingerprint, reservation, in-progress operation, and completed result. `IdempotencyRecord` is the entity. `IdempotencyKey` and `RequestFingerprint` are opaque value objects with their own invariants.
 
-## Fronteiras
+## Layers
 
-- **Domínio:** registro, estados e value objects; não conhece Node.js, banco ou transporte.
-- **Aplicação:** `ExecuteIdempotently` orquestra reservar → executar → concluir/liberar.
-- **Infraestrutura:** SHA-256 e repositório em memória implementam portas.
+- **Domain:** records, states, and value objects; independent of Node.js, databases, and transport.
+- **Application:** `ExecuteIdempotently` coordinates reserve, execute, and complete/release.
+- **Infrastructure:** SHA-256 and the in-memory repository implement application ports.
 
-Fluxo: cliente → caso de uso → portas de fingerprint/persistência → adaptadores.
+Flow: client -> use case -> fingerprint/persistence ports -> adapters.
 
-## Padrões e alternativas
+## Patterns and alternatives
 
-- **Repository:** troca memória por Redis/PostgreSQL sem mudar o caso de uso. Active Record foi descartado porque acoplaria regra e persistência.
-- **Strategy:** permite fingerprint canônico por contrato. Um hash fixo dentro do caso de uso foi descartado porque JSON simples não serve para todo payload.
-- Visitor e Factory Method não foram usados: não há família de operações sobre tipos heterogêneos nem criação complexa.
+- **Repository:** replaces memory with Redis or PostgreSQL without changing the use case. Active Record was rejected because it couples business rules to persistence.
+- **Strategy:** supports canonical fingerprints for different contracts. A fixed hash inside the use case was rejected because plain JSON serialization is not suitable for every payload.
+- Visitor and Factory Method are not used because there is neither a heterogeneous element family nor complex object construction.
 
-O principal trade-off é delegar atomicidade ao adaptador. A versão em memória é didática; produção exige operação condicional e recuperação de reservas órfãs.
+The main trade-off is assigning atomicity to the adapter. The in-memory version is educational; production needs a conditional operation and recovery for orphaned reservations.

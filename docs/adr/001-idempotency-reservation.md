@@ -1,13 +1,13 @@
-# ADR-001: reservar antes de executar
+# ADR-001: Atomic idempotency reservation
 
 ## Status
 
-Aceito.
+Accepted for the portfolio scope.
 
-## Decisão
+## Decision
 
-Reservar a chave atomicamente antes da operação e concluir somente após sucesso.
+Reserve the key atomically before executing the operation and complete the record only after success.
 
-## Consequências
+## Consequences
 
-Evita execução concorrente duplicada. Uma implementação distribuída precisa expiração, ownership e tratamento de processos interrompidos.
+This prevents duplicate concurrent execution. A distributed implementation also needs expiration, ownership, and recovery for interrupted processes.
